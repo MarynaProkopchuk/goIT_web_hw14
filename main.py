@@ -12,7 +12,7 @@ from typing import Callable
 from fastapi.responses import JSONResponse
 
 app = FastAPI()
-origins = ["http://localhost:3000"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,11 +33,15 @@ app.include_router(users.router, prefix="/api")
 
 @app.middleware("http")
 async def ban_ips(request: Request, call_next: Callable):
-    ip = ip_address(request.client.host)
-    if ip in banned_ips:
-        return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN, content={"detail": "You are banned"}
-        )
+    try:
+        ip = ip_address(request.client.host)
+        if ip in banned_ips:
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={"detail": "You are banned"},
+            )
+    except ValueError:
+        pass
     response = await call_next(request)
     return response
 

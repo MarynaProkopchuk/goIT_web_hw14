@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
+
 
 from src.schemas.user import UserResponse
 
@@ -16,9 +17,7 @@ class ContactSchema(BaseModel):
 class ContactUpdateSchema(BaseModel):
     email: EmailStr | None = None
     phone: str | None = Field(max_length=10, default=None)
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)  # noqa
 
 
 class ContactResponse(BaseModel):
@@ -31,6 +30,4 @@ class ContactResponse(BaseModel):
     created_at: datetime | None
     updated_at: datetime | None
     user: UserResponse | None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)  # noqa

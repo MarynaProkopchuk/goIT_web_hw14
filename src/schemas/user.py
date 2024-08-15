@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 class UserSchema(BaseModel):
@@ -14,10 +14,8 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: EmailStr
-    avatar: Optional[str] = None
-
-    class Config:
-        from_attributes = True
+    avatar: Optional[str] | None
+    model_config = ConfigDict(from_attributes=True)  # noqa
 
 
 class TokenSchema(BaseModel):

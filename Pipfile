@@ -19,9 +19,14 @@ redis = "*"
 fastapi-limiter = "*"
 cloudinary = "*"
 sphinx = "*"
+pytest = "*"
 
 [dev-packages]
 sphinx = "*"
+aiosqlite = "*"
+pytest-asyncio = "*"
+httpx = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.12"
