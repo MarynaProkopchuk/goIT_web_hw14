@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.conf import messages
 from src.database.db import get_db
 from src.entity.models import User
 from fastapi_limiter.depends import RateLimiter
@@ -18,7 +20,7 @@ async def get_contacts(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    ''' Get contacts for a given user.
+    """Get contacts for a given user.
 
     :param limit: Limit of contacts to return
     :type limit: int
@@ -29,7 +31,7 @@ async def get_contacts(
     :param user: current authenticated user
     :type user: User
     :return: List of contacts for the user
-    :rtype: List[ContactResponse]'''
+    :rtype: List[ContactResponse]"""
     contacts = await repositories_contacts.get_contacts(limit, offset, db, user)
     return contacts
 
@@ -42,7 +44,7 @@ async def search_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    ''' Search for a contact by name, surname or email.
+    """Search for a contact by name, surname or email.
 
     :param name: Name of the contact
     :type name: str
@@ -55,7 +57,7 @@ async def search_contact(
     :param user: current authenticated user
     :type user: User
     :return: Contact matching the search criteria
-    :rtype: ContactResponse'''
+    :rtype: ContactResponse"""
     if not any([name, surname, email]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -65,7 +67,7 @@ async def search_contact(
     contact = await repositories_contacts.get_contact(name, surname, email, db, user)
     if not contact:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No contact found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.NO_CONTACT_FOUND
         )
     return contact
 
@@ -81,7 +83,7 @@ async def create_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    ''' Create a new contact.
+    """Create a new contact.
 
     :param body: Contact data
     :type body: ContactSchema
@@ -90,7 +92,7 @@ async def create_contact(
     :param user: current authenticated user
     :type user: User
     :return: Created contact
-    :rtype: ContactResponse'''
+    :rtype: ContactResponse"""
     contact = await repositories_contacts.create_contact(body, db, user)
     return contact
 
@@ -104,7 +106,7 @@ async def update_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    ''' Update contact by name, surname or email.
+    """Update contact by name, surname or email.
 
     :param body: Contact data to update
     :type body: ContactUpdateSchema
@@ -119,7 +121,7 @@ async def update_contact(
     :param user: current authenticated user
     :type user: User
     :return: Updated contact
-    :rtype: ContactResponse'''
+    :rtype: ContactResponse"""
     if not any([name, surname, email]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -150,7 +152,7 @@ async def delete_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    ''' Delete contact by name, surname or email.
+    """Delete contact by name, surname or email.
 
     :param name: Name of the contact
     :type name: str
@@ -161,7 +163,7 @@ async def delete_contact(
     :param db: database connection
     :type db: AsyncSession
     :param user: current authenticated user
-    :type user: User'''
+    :type user: User"""
     if not any([name, surname, email]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -181,18 +183,18 @@ async def get_upcoming_birthdays(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    ''' Get contacts with upcoming birthdays.
+    """Get contacts with upcoming birthdays.
 
     :param db: database connection
     :type db: AsyncSession
     :param user: current authenticated user
     :type user: User
     :return: List of contacts with upcoming birthdays
-    :rtype: List[ContactResponse]'''
+    :rtype: List[ContactResponse]"""
     contacts = await repositories_contacts.get_upcoming_birthdays(db, user)
     if not contacts:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No contacts with upcoming birthdays found",
+            detail=messages.BIRTHDAYS_NOT_FOUND,
         )
     return contacts
